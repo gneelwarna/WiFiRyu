@@ -1,0 +1,7 @@
+
+BSSID, First time seen, Last time seen, channel, Speed, Privacy, Cipher, Authentication, Power, # beacons, # IV, LAN IP, ID-length, ESSID, Key
+80:58:F8:15:11:E3, 2018-02-05 01:27:05, 2018-02-05 01:27:10,  9,  54, WPA2, CCMP,PSK, -73,        2,        0,   0.  0.  0.  0,  20, Moto G (5) Plus 9460, 
+80:58:F8:17:8E:DF, 2018-02-05 01:26:58, 2018-02-05 01:27:13,  1,  54, WPA2, CCMP,PSK, -53,       38,        0,   0.  0.  0.  0,  18, I'm Under Your Bed, 
+
+Station MAC, First time seen, Last time seen, Power, # packets, BSSID, Probed ESSIDs
+
