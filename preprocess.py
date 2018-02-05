@@ -1,4 +1,9 @@
-import os, shutil
+"""This is preprocess module. It creates temporary
+directory to store airodump-ng output files."""
+
+
+import os
+import shutil
 
 
 class preprocessor:

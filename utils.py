@@ -1,5 +1,8 @@
+"""This is utils module. It creates JSON
+out of airodump-ng csv output file."""
+
+
 from flask import jsonify
-import json, csv
 
 
 def strip_input(entry):

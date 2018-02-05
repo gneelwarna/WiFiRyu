@@ -1,11 +1,15 @@
-from flask import Flask, jsonify, request, json, abort, Response
+"""This is WifiRyu main module."""
+
+
+from flask import Flask, jsonify, request
 from preprocess import preprocessor
 from utils import airodump_json_parser
-import os
 from pathlib2 import Path
+import os
 import subprocess
 import signal
 import shlex
+
 
 app = Flask(__name__)
 monitor_interfaces = []
@@ -22,11 +26,12 @@ def login():
     for i in request.args:
         args += args
     return str(args)
-    # return app.send_static_file('login.html')
 
 
 @app.route('/airmon/list')
 def airmon_list():
+    """Lists wireless interfaces present on machine.
+    """
     output = (subprocess.check_output('airmon-ng').split('\n'))
     interfaces = []
     for line in output:
@@ -46,6 +51,8 @@ def airmon_list():
 
 @app.route('/airmon/interface', methods=['PUT'])
 def airmon_interface():
+    """Start/stop monitor mode on an interface.
+    """
     print request.args['operation'] + ' ' + request.args['interface']
     output = subprocess.check_output(['airmon-ng ' +
                                       request.args['operation'] +
@@ -72,6 +79,9 @@ def airmon_interface():
 
 @app.route('/airmon/check')
 def airmon_check():
+    """Returns a list of all possible programs
+    that could interfere with monitor card.
+    """
     output = subprocess.check_output(['airmon-ng check'], shell=True)
     processes = []
     if output.__contains__('PID Name'):
@@ -90,6 +100,9 @@ def airmon_check():
 
 @app.route('/airmon/checkkill')
 def airmon_checkkill():
+    """Try to kill all possible programs
+    that could interfere with monitor card.
+    """
     output = subprocess.check_output(['airmon-ng check kill'], shell=True)
     processes = []
     if output.__contains__('PID Name'):
@@ -108,6 +121,8 @@ def airmon_checkkill():
 
 @app.route('/airmon/moninterface', methods=['GET'])
 def airmon_moninterface():
+    """List all monitor mode interfaces.
+    """
     data = {}
     data['status'] = 'ok'
     data['interfaces'] = monitor_interfaces
@@ -118,6 +133,8 @@ def airmon_moninterface():
 
 @app.route('/airodump', methods=['GET'])
 def airodump():
+    """Returns airodump-ng output.
+    """
     dump_file = Path('/tmp/ryu/airodump-sample.csv')
     if dump_file.is_file():
         return airodump_json_parser('/tmp/ryu/airodump-sample.csv')
@@ -132,6 +149,8 @@ def airodump():
 
 @app.route('/airodump', methods=['PUT'])
 def airodump_op():
+    """Start/stop airodump-ng with different arguments.
+    """
     cmd = 'airodump-ng '
     request_data = request.get_json()
     operation = request_data['operation']
@@ -167,7 +186,6 @@ def airodump_op():
         interface = request_data['interface']
         cmd += interface
         print 'cmd = ' + cmd
-        # raw_input("What you say, continue?    ")
         proc = subprocess.Popen(shlex.split(cmd))
         data = {}
         data['status'] = 'ok'
@@ -185,7 +203,17 @@ def airodump_op():
         return resp
 
 
+@app.errorhandler(404)
+def not_found(error=None):
+    data = { 'status': 'error',
+             'message': 'Not found; ' + request.url,
+             }
+    resp = jsonify(data)
+    resp.status_code = 404
+    return resp
+
+
 if __name__ == '__main__':
-    # preproc = preprocessor()
-    # preproc.prepare_output_dir()
+    preproc = preprocessor()
+    preproc.prepare_output_dir()
     app.run(debug=True)
